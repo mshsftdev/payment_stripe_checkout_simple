@@ -1,0 +1,7 @@
+Publishable key
+pk_test_51RrzHFJuMDk3u5zNriwPjwtgZnEZmDNa9qior1xVOKHRqEZM8CNjY3InX6nNz971IxmArp6plh2scjkQpxisEWuF006f7adw9F
+
+Secret key
+sk_test_51RrzHFJuMDk3u5zNyZV0DN081VfEWt5teBsrDLAB97izewVLXK0zSHU8ziQf1t2MMC4IHxzVOc1dTjsTE9deZAhq004ccaIZmn
+
+

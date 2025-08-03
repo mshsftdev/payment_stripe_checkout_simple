@@ -123,83 +123,95 @@
     </div>
 </div>
 
+<input id="pk" type="hidden" th:value="${pk}"></input>
+
+
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<script >
-    // const stripe = Stripe("PROVIDE YOUR KEY");
-    const stripe = Stripe("pk_test_51RrzHFJuMDk3u5zNriwPjwtgZnEZmDNa9qior1xVOKHRqEZM8CNjY3InX6nNz971IxmArp6plh2scjkQpxisEWuF006f7adw9F");
+<script th:inline="javascript">
+        console.log( "ready!" );
 
-    document.querySelectorAll(".product-card").forEach(card => {
-    const decrementBtn = card.querySelector(".decrement");
-    const incrementBtn = card.querySelector(".increment");
-    const quantityDisplay = card.querySelector(".quantity-display");
-    const productPriceDisplay = card.querySelector(".product-price");
-    const productPriceInCents = parseInt(card.dataset.price); // Price in cents
+        // const pk = /*[[${pk}]]*/ 'default_pk_value';
+        // alert(pk);
+        const pk = document.querySelector("#pk").value;
+        alert(pk);
 
-    // Quantity decrement logic
-    decrementBtn.addEventListener("click", () => {
-        let quantity = parseInt(quantityDisplay.value);
-        if (quantity > 1) {
-            quantity -= 1;
-            quantityDisplay.value = quantity;
+        // const stripe = Stripe("PROVIDE YOUR KEY");
+        // const stripe = Stripe("pk_test_51RrzHFJuMDk3u5zNriwPjwtgZnEZmDNa9qior1xVOKHRqEZM8CNjY3InX6nNz971IxmArp6plh2scjkQpxisEWuF006f7adw9F");
+        const stripe = Stripe(pk);
 
-            // Update the price display
-            const totalPrice = (productPriceInCents * quantity) / 100;
-            productPriceDisplay.textContent = `Price: $${totalPrice.toFixed(2)}`;
-        }
-    });
+        document.querySelectorAll(".product-card").forEach(card => {
+            const decrementBtn = card.querySelector(".decrement");
+            const incrementBtn = card.querySelector(".increment");
+            const quantityDisplay = card.querySelector(".quantity-display");
+            const productPriceDisplay = card.querySelector(".product-price");
+            const productPriceInCents = parseInt(card.dataset.price); // Price in cents
 
-    // Quantity increment logic
-    incrementBtn.addEventListener("click", () => {
-        let quantity = parseInt(quantityDisplay.value);
-        quantity += 1;
-        quantityDisplay.value = quantity;
+            // Quantity decrement logic
+            decrementBtn.addEventListener("click", () => {
+                let quantity = parseInt(quantityDisplay.value);
+                if (quantity > 1) {
+                    quantity -= 1;
+                    quantityDisplay.value = quantity;
 
-        // Update the price display
-        const totalPrice = (productPriceInCents * quantity) / 100;
-        productPriceDisplay.textContent = `Price: $${totalPrice.toFixed(2)}`;
-    });
-
-    // Checkout button logic
-    card.querySelector(".checkout-button").addEventListener("click", async () => {
-        const productName = card.dataset.name; // Product name
-        const quantity = parseInt(quantityDisplay.value); // Quantity selected
-
-        try {
-            // Create the DTO object to match backend fields
-            const createPaymentRequest = {
-                name: productName, // Product name
-                amount: productPriceInCents, // Total amount in cents (Stripe expects cents)
-                quantity // Quantity
-            };
-
-            // Send request to backend
-            const response = await fetch("/product/v1/checkout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(createPaymentRequest)
+                    // Update the price display
+                    const totalPrice = (productPriceInCents * quantity) / 100;
+                    productPriceDisplay.textContent = `Price: $${totalPrice.toFixed(2)}`;
+                }
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            // Quantity increment logic
+            incrementBtn.addEventListener("click", () => {
+                let quantity = parseInt(quantityDisplay.value);
+                quantity += 1;
+                quantityDisplay.value = quantity;
 
-            // Assuming the backend responds with the sessionId and httpStatus
-            const stripeResponse = await response.json();
+                // Update the price display
+                const totalPrice = (productPriceInCents * quantity) / 100;
+                productPriceDisplay.textContent = `Price: $${totalPrice.toFixed(2)}`;
+            });
 
-            // Redirect to Stripe Checkout
-            const result = await stripe.redirectToCheckout({ sessionId: stripeResponse.sessionId });
-            if (result.error) {
-                console.error("Stripe Checkout Error:", result.error.message);
-            }
-        } catch (error) {
-            console.error("Error during checkout:", error);
-        }
-    });
-});
+            // Checkout button logic
+            card.querySelector(".checkout-button").addEventListener("click", async () => {
+                const productName = card.dataset.name; // Product name
+                const quantity = parseInt(quantityDisplay.value); // Quantity selected
+
+                try {
+                    // Create the DTO object to match backend fields
+                    const createPaymentRequest = {
+                        name: productName, // Product name
+                        amount: productPriceInCents, // Total amount in cents (Stripe expects cents)
+                        quantity // Quantity
+                    };
+
+                    // Send request to backend
+                    const response = await fetch("/product/v1/checkout", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(createPaymentRequest)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    // Assuming the backend responds with the sessionId and httpStatus
+                    const stripeResponse = await response.json();
+
+                    // Redirect to Stripe Checkout
+                    const result = await stripe.redirectToCheckout({ sessionId: stripeResponse.sessionId });
+                    if (result.error) {
+                        console.error("Stripe Checkout Error:", result.error.message);
+                    }
+                } catch (error) {
+                    console.error("Error during checkout:", error);
+                }
+            });
+        });
+
 
 </script>
 
